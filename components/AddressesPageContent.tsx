@@ -73,7 +73,7 @@ export default function AddressesPageContent() {
   const [form, setForm] = useState(INITIAL_FORM);
 
   const userName = profile.displayName || (profile.firstName ? `${profile.firstName} ${profile.lastName}` : "کاربر ترخینه");
-  const userPhone = auth.phone || profile.phone || "۰۹۱۴ ۸۶۴ ۳۳۵۰";
+  const userPhone = auth.phone || profile.phone || "";
 
   const openAdd = () => {
     setEditId(null);
@@ -186,12 +186,25 @@ export default function AddressesPageContent() {
 
       {modalStep === "map" && (
         <Modal title="افزودن آدرس" onClose={() => setModalStep("closed")}>
-          <div className="relative w-full h-65 sm:h-70 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 select-none">
-            <Image src="/map.png" alt="نقشه تهران" fill className="object-cover object-center pointer-events-none" priority />
-            <div className="absolute bottom-3 inset-x-4">
-              <div className="flex items-center gap-2 bg-white rounded-xl px-3.5 py-2 border border-neutral-200 shadow-md">
-                <Location size={18} color="currentColor" variant="Linear" className="text-neutral-400 shrink-0" />
-                <span className="text-xs sm:text-sm text-neutral-700 truncate">{form.detail}</span>
+          <div className="relative w-full h-72 sm:h-80 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 select-none">
+            <iframe
+              src="https://maps.google.com/maps?q=35.7005,51.3380&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full border-0"
+              loading="lazy"
+              title="نقشه موقعیت مکانی"
+            />
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center -translate-y-3">
+              <div className="flex flex-col items-center">
+                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-lg border-2 border-white">
+                  <Location size={20} color="currentColor" variant="Bold" />
+                </div>
+                <div className="w-2.5 h-1.5 rounded-full bg-black/30 blur-[1px] mt-0.5" />
+              </div>
+            </div>
+            <div className="absolute bottom-3 inset-x-4 pointer-events-none">
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-xs rounded-xl px-3.5 py-2 border border-neutral-200 shadow-md">
+                <Location size={18} color="currentColor" variant="Linear" className="text-primary shrink-0" />
+                <span className="text-xs sm:text-sm text-neutral-700 truncate font-medium">{form.detail}</span>
               </div>
             </div>
           </div>

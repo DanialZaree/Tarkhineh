@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { User, Wallet2, Heart, Location, Logout } from "iconsax-react";
@@ -27,11 +27,20 @@ export default function ProfileSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { profile } = useProfile();
   const { auth, logout } = useAuth();
 
-  const currentName = userName || profile.displayName || (profile.firstName ? `${profile.firstName} ${profile.lastName}` : "کاربر ترخینه");
-  const currentPhone = userPhone || auth.phone || profile.phone || "۰۹۱۴ ۸۶۴ ۳۳۵۰";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const currentName = mounted
+    ? (userName || profile.displayName || (profile.firstName ? `${profile.firstName} ${profile.lastName}` : "کاربر ترخینه"))
+    : (userName || "کاربر ترخینه");
+  const currentPhone = mounted
+    ? (userPhone || auth.phone || profile.phone || "")
+    : (userPhone || "");
 
   return (
     <>
@@ -41,7 +50,9 @@ export default function ProfileSidebar({
             <User size={40} color="currentColor" variant="Linear" />
           </div>
           <h3 className="font-bold text-base text-tarkhineh-dark mt-3.5">{userName || currentName}</h3>
-          <p dir="ltr" className="text-xs text-neutral-500 mt-1 font-sans">{toPersianDigits(userPhone || currentPhone)}</p>
+          {mounted && currentPhone && (
+            <p dir="ltr" className="text-xs text-neutral-500 mt-1 font-sans">{toPersianDigits(currentPhone)}</p>
+          )}
         </div>
 
         <div className="border-t border-neutral-200 my-5" />

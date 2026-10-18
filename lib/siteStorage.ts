@@ -40,59 +40,21 @@ export type StorageKeyDomain = "cart" | "favorites" | "profile" | "addresses" | 
 const STORAGE_EVENT = "tarkhineh_storage_change";
 
 export const INITIAL_PROFILE: UserProfile = {
-  firstName: "کاربر",
-  lastName: "ترخینه",
-  email: "Example@Gmail.Com",
-  phone: "۰۹۱۴ ۸۶۴ ۳۳۵۰",
-  birthDate: "۱۳۸۱/۰۵/۰۱",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  birthDate: "",
   displayName: "کاربر ترخینه",
 };
 
-export const INITIAL_AUTH: AuthState = { isLoggedIn: true, phone: "۰۹۱۴ ۸۶۴ ۳۳۵۰" };
+export const INITIAL_AUTH: AuthState = { isLoggedIn: false, phone: null };
 
-const INITIAL_FAVORITES_DEFAULT: FavoriteItem[] = [
-  { id: "pasta-sabzijat", name: "پاستا سبزیجات", price: "۱۴۰,۰۰۰", image: "/food/pasta.png", rating: 4, category: "main" },
-  { id: "pizza-esfenaj", name: "پیتزا اسفناج", price: "۲۵۲,۰۰۰", image: "/food/mushroom-pizza.png", rating: 4, category: "main" },
-  { id: "ratatui", name: "راتاتویی", price: "۱۸۰,۰۰۰", image: "/food/coco.png", rating: 5, category: "main" },
-];
+const INITIAL_FAVORITES_DEFAULT: FavoriteItem[] = [];
 
-const INITIAL_ADDRESSES_DEFAULT: AddressItem[] = [
-  { id: "addr-1", title: "خانه", detail: "ولیعصر، خیابان بزرگمهر، کوچه نسیم، پلاک ۴، واحد ۱۲", phone: "۰۹۱۴ ۸۶۴ ۳۳۵۰", recipientName: "کاربر ترخینه", isSelf: true },
-  { id: "addr-2", title: "محل کار", detail: "ونک، خیابان ملاصدرا، نرسیده به پل کردستان، پلاک ۵۶", phone: "۰۹۱۲ ۱۲۳ ۴۵۶۷", recipientName: "کاربر ترخینه", isSelf: false },
-];
+const INITIAL_ADDRESSES_DEFAULT: AddressItem[] = [];
 
-const INITIAL_ORDERS_DEFAULT: Order[] = [
-  {
-    id: "ord-1",
-    branch: "شعبه اقدسیه",
-    status: "current",
-    deliveryType: "ارسال توسط پیک",
-    date: "شنبه، ۸ مرداد، ساعت ۱۸:۵۳",
-    deliveryTimeRemaining: "۲۵:۳۳",
-    address: "اقدسیه، بزرگراه ارتش، مجتمع شمیران سنتر، طبقه ۱۰",
-    totalPrice: "۲۲۸,۵۰۰ تومان",
-    discount: "۲۸,۵۰۰ تومان",
-    items: [
-      { id: "1", name: "کوکو سبزی", price: "۲۷۰,۰۰۰ تومان", quantity: 3, image: "/food/coco.png" },
-      { id: "2", name: "دلمه برگ مو", price: "۱۹۵,۰۰۰ تومان", quantity: 1, image: "/food/dolme-barg.png" },
-      { id: "3", name: "دلمه کلم برگ", price: "۲۰۹,۰۰۰ تومان", quantity: 2, image: "/food/dolme-barg.png" },
-    ],
-  },
-  {
-    id: "ord-2",
-    branch: "شعبه ونک",
-    status: "delivered",
-    deliveryType: "تحویل حضوری",
-    date: "پنج‌شنبه، ۶ مرداد، ساعت ۱۳:۲۰",
-    address: "ونک، خیابان ملاصدرا، نرسیده به پل کردستان، پلاک ۵۶",
-    totalPrice: "۴۲۰,۰۰۰ تومان",
-    discount: "۰ تومان",
-    items: [
-      { id: "4", name: "بادمجان شکم‌پر", price: "۱۳۶,۰۰۰ تومان", quantity: 1, image: "/food/bademjan.png" },
-      { id: "5", name: "بورانی بادمجان", price: "۱۴۸,۰۰۰ تومان", quantity: 2, image: "/food/borani.png" },
-    ],
-  },
-];
+const INITIAL_ORDERS_DEFAULT: Order[] = [];
 
 const cache: Record<string, any> = {};
 
@@ -101,7 +63,30 @@ function getStorage<T>(key: string, fallback: T, domain: StorageKeyDomain): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = localStorage.getItem(key);
-    cache[domain] = raw ? JSON.parse(raw) : fallback;
+    let parsed = raw ? JSON.parse(raw) : fallback;
+
+    if (domain === "auth" && parsed?.phone === "۰۹۱۴ ۸۶۴ ۳۳۵۰") {
+      parsed = fallback;
+      localStorage.setItem(key, JSON.stringify(fallback));
+    }
+    if (domain === "cart" && Array.isArray(parsed) && (parsed.length === 4 || parsed.some((i: any) => i.id === "pasta-sabzijat" || i.id === "pizza-esfenaj"))) {
+      parsed = fallback;
+      localStorage.setItem(key, JSON.stringify(fallback));
+    }
+    if (domain === "profile" && parsed?.phone === "۰۹۱۴ ۸۶۴ ۳۳۵۰") {
+      parsed = fallback;
+      localStorage.setItem(key, JSON.stringify(fallback));
+    }
+    if (domain === "addresses" && Array.isArray(parsed) && parsed.some((a: any) => a.phone === "۰۹۱۴ ۸۶۴ ۳۳۵۰")) {
+      parsed = fallback;
+      localStorage.setItem(key, JSON.stringify(fallback));
+    }
+    if (domain === "orders" && Array.isArray(parsed) && parsed.some((o: any) => o.id === "ord-1" || o.id === "ord-2")) {
+      parsed = fallback;
+      localStorage.setItem(key, JSON.stringify(fallback));
+    }
+
+    cache[domain] = parsed;
     if (!raw) localStorage.setItem(key, JSON.stringify(fallback));
   } catch {
     cache[domain] = fallback;
@@ -283,15 +268,15 @@ export function useStorageListener(domains: StorageKeyDomain[], onUpdate: () => 
   }, [domains, onUpdate]);
 }
 
-function useDomainState<T>(domain: StorageKeyDomain, getter: () => T) {
-  const [data, setData] = useState<T>(getter);
+function useDomainState<T>(domain: StorageKeyDomain, getter: () => T, fallback: T) {
+  const [data, setData] = useState<T>(fallback);
   useEffect(() => { setData(getter()); }, [getter]);
   useStorageListener([domain], () => setData(getter()));
   return data;
 }
 
 export function useCart() {
-  const items = useDomainState("cart", getStoredCart);
+  const items = useDomainState("cart", getStoredCart, []);
   const totals = useMemo(() => getCartTotals(items), [items]);
   return {
     items,
@@ -304,23 +289,23 @@ export function useCart() {
 }
 
 export function useFavorites() {
-  const favorites = useDomainState("favorites", getStoredFavorites);
+  const favorites = useDomainState("favorites", getStoredFavorites, INITIAL_FAVORITES_DEFAULT);
   const isFavorite = useCallback((id: string) => favorites.some((f) => f.id === id), [favorites]);
   return { favorites, isFavorite, toggleFavorite, removeFavorite };
 }
 
 export function useAddresses() {
-  return { addresses: useDomainState("addresses", getStoredAddresses), upsertAddress, deleteAddress };
+  return { addresses: useDomainState("addresses", getStoredAddresses, INITIAL_ADDRESSES_DEFAULT), upsertAddress, deleteAddress };
 }
 
 export function useOrders() {
-  return { orders: useDomainState("orders", getStoredOrders), createOrder: createOrderFromCart, cancelOrder };
+  return { orders: useDomainState("orders", getStoredOrders, INITIAL_ORDERS_DEFAULT), createOrder: createOrderFromCart, cancelOrder };
 }
 
 export function useProfile() {
-  return { profile: useDomainState("profile", getStoredProfile), updateProfile: saveStoredProfile };
+  return { profile: useDomainState("profile", getStoredProfile, INITIAL_PROFILE), updateProfile: saveStoredProfile };
 }
 
 export function useAuth() {
-  return { auth: useDomainState("auth", getStoredAuth), login: loginUser, logout: logoutUser };
+  return { auth: useDomainState("auth", getStoredAuth, INITIAL_AUTH), login: loginUser, logout: logoutUser };
 }
